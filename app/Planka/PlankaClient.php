@@ -65,7 +65,7 @@ final class PlankaClient implements PlankaClientInterface
         }
 
         $headers = [
-            'X-Api-Key' => $apiKey,
+            'Authorization' => 'Bearer ' . $apiKey,
             'Accept' => 'application/json',
         ];
 
@@ -105,7 +105,7 @@ final class PlankaClient implements PlankaClientInterface
         }
 
         $headers = [
-            'X-Api-Key' => $apiKey,
+            'Authorization' => 'Bearer ' . $apiKey,
             'Accept' => 'application/json',
         ];
 

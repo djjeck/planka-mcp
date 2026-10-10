@@ -57,15 +57,15 @@ final class LabelServiceTest extends TestCase
 
     public function testManageLabelUpdateSuccess(): void
     {
-        $expected = ['item' => ['id' => 'label1', 'name' => 'Updated', 'color' => 'sky-blue']];
+        $expected = ['item' => ['id' => 'label1', 'name' => 'Updated', 'color' => 'morning-sky']];
 
         $this->plankaClient
             ->expects($this->once())
             ->method('patch')
-            ->with('test-api-key', '/api/labels/label1', ['name' => 'Updated', 'color' => 'sky-blue'])
+            ->with('test-api-key', '/api/labels/label1', ['name' => 'Updated', 'color' => 'morning-sky'])
             ->willReturn($expected);
 
-        $this->assertSame($expected, $this->service->manageLabel('test-api-key', 'update', null, 'label1', 'Updated', 'sky-blue'));
+        $this->assertSame($expected, $this->service->manageLabel('test-api-key', 'update', null, 'label1', 'Updated', 'morning-sky'));
     }
 
     public function testManageLabelUpdateRequiresLabelId(): void

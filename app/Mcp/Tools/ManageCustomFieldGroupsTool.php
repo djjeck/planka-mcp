@@ -35,7 +35,7 @@ final class ManageCustomFieldGroupsTool extends Tool
                 ->description('Project ID — required for create_base'),
             'baseGroupId' => $schema->string()
                 ->nullable()
-                ->description('Base custom field group ID — required for update_base and delete_base'),
+                ->description('Base custom field group ID — required for update_base and delete_base; optional for create (board/card) to link the new group to a project-level base group, so the base group\'s fields appear on that board/card'),
             'parentType' => $schema->string()
                 ->nullable()
                 ->description('Required for create: whether the group belongs to a board or a card')
@@ -74,7 +74,7 @@ final class ManageCustomFieldGroupsTool extends Tool
                 'create_base' => $this->customFieldService->createBaseGroup($apiKey, $projectId ?? throw new ValidationException('projectId required for create_base'), $name),
                 'update_base' => $this->customFieldService->updateBaseGroup($apiKey, $baseGroupId ?? throw new ValidationException('baseGroupId required for update_base'), $name),
                 'delete_base' => $this->customFieldService->deleteBaseGroup($apiKey, $baseGroupId ?? throw new ValidationException('baseGroupId required for delete_base')),
-                'create' => $this->customFieldService->createGroup($apiKey, $parentType ?? throw new ValidationException('parentType required for create'), $parentId ?? throw new ValidationException('parentId required for create'), $name),
+                'create' => $this->customFieldService->createGroup($apiKey, $parentType ?? throw new ValidationException('parentType required for create'), $parentId ?? throw new ValidationException('parentId required for create'), $name, $baseGroupId),
                 'get' => $this->customFieldService->getGroup($apiKey, $groupId ?? throw new ValidationException('groupId required for get')),
                 'update' => $this->customFieldService->updateGroup($apiKey, $groupId ?? throw new ValidationException('groupId required for update'), $name),
                 'delete' => $this->customFieldService->deleteGroup($apiKey, $groupId ?? throw new ValidationException('groupId required for delete')),

@@ -16,7 +16,7 @@ interface CustomFieldServiceInterface
     public function deleteBaseGroup(string $apiKey, string $baseGroupId): array;
 
     /** @return array<mixed> */
-    public function createGroup(string $apiKey, string $parentType, string $parentId, ?string $name): array;
+    public function createGroup(string $apiKey, string $parentType, string $parentId, ?string $name, ?string $baseGroupId = null): array;
 
     /** @return array<mixed> */
     public function getGroup(string $apiKey, string $groupId): array;

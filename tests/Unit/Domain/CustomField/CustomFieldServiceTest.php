@@ -152,6 +152,39 @@ final class CustomFieldServiceTest extends TestCase
         $this->assertSame($expected, $this->service->createGroup('test-api-key', 'board', 'board1', null));
     }
 
+    public function testCreateGroupForBoardLinkedToBaseGroupSuccess(): void
+    {
+        $expected = ['item' => ['id' => 'g1', 'name' => 'Group', 'baseCustomFieldGroupId' => 'bg1']];
+
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('post')
+            ->with('test-api-key', '/api/boards/board1/custom-field-groups', [
+                'position' => 65536,
+                'name' => 'Group',
+                'baseCustomFieldGroupId' => 'bg1',
+            ])
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->service->createGroup('test-api-key', 'board', 'board1', 'Group', 'bg1'));
+    }
+
+    public function testCreateGroupForCardLinkedToBaseGroupSuccess(): void
+    {
+        $expected = ['item' => ['id' => 'g2', 'baseCustomFieldGroupId' => 'bg1']];
+
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('post')
+            ->with('test-api-key', '/api/cards/card1/custom-field-groups', [
+                'position' => 65536,
+                'baseCustomFieldGroupId' => 'bg1',
+            ])
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->service->createGroup('test-api-key', 'card', 'card1', null, 'bg1'));
+    }
+
     public function testGetGroupSuccess(): void
     {
         $expected = ['item' => ['id' => 'g1', 'name' => 'Group']];

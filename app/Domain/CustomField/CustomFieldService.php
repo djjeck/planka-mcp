@@ -42,7 +42,7 @@ final class CustomFieldService implements CustomFieldServiceInterface
     }
 
     /** @return array<mixed> */
-    public function createGroup(string $apiKey, string $parentType, string $parentId, ?string $name): array
+    public function createGroup(string $apiKey, string $parentType, string $parentId, ?string $name, ?string $baseGroupId = null): array
     {
         $path = match ($parentType) {
             'board' => '/api/boards/' . $parentId . '/custom-field-groups',
@@ -53,6 +53,9 @@ final class CustomFieldService implements CustomFieldServiceInterface
         $body = ['position' => 65536];
         if ($name !== null) {
             $body['name'] = $name;
+        }
+        if ($baseGroupId !== null) {
+            $body['baseCustomFieldGroupId'] = $baseGroupId;
         }
 
         return $this->plankaClient->post($apiKey, $path, $body);

@@ -15,6 +15,7 @@ interface ListServiceInterface
         ?string $name = null,
         ?int $position = null,
         ?string $toListId = null,
+        ?string $type = null,
     ): array;
 
     /** @return array<mixed> */

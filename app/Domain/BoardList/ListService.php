@@ -22,10 +22,11 @@ final class ListService implements ListServiceInterface
         ?string $name = null,
         ?int $position = null,
         ?string $toListId = null,
+        ?string $type = null,
     ): array {
         return match ($action) {
-            'create' => $this->createList($apiKey, $boardId ?? throw new ValidationException('boardId required for create'), $name, $position),
-            'update' => $this->updateList($apiKey, $listId ?? throw new ValidationException('listId required for update'), $name, $position),
+            'create' => $this->createList($apiKey, $boardId ?? throw new ValidationException('boardId required for create'), $name, $position, $type),
+            'update' => $this->updateList($apiKey, $listId ?? throw new ValidationException('listId required for update'), $name, $position, $type),
             'delete' => $this->deleteList($apiKey, $listId ?? throw new ValidationException('listId required for delete')),
             'get' => $this->getList($apiKey, $listId ?? throw new ValidationException('listId required for get')),
             'get_cards' => $this->getListCards($apiKey, $listId ?? throw new ValidationException('listId required for get_cards')),
@@ -48,9 +49,9 @@ final class ListService implements ListServiceInterface
     }
 
     /** @return array<mixed> */
-    private function createList(string $apiKey, string $boardId, ?string $name, ?int $position): array
+    private function createList(string $apiKey, string $boardId, ?string $name, ?int $position, ?string $type): array
     {
-        $body = ['type' => 'active', 'position' => $position ?? 65536];
+        $body = ['type' => $type ?? 'active', 'position' => $position ?? 65536];
         if ($name !== null) {
             $body['name'] = $name;
         }
@@ -58,7 +59,7 @@ final class ListService implements ListServiceInterface
     }
 
     /** @return array<mixed> */
-    private function updateList(string $apiKey, string $listId, ?string $name, ?int $position): array
+    private function updateList(string $apiKey, string $listId, ?string $name, ?int $position, ?string $type): array
     {
         $body = [];
         if ($name !== null) {
@@ -66,6 +67,9 @@ final class ListService implements ListServiceInterface
         }
         if ($position !== null) {
             $body['position'] = $position;
+        }
+        if ($type !== null) {
+            $body['type'] = $type;
         }
         return $this->plankaClient->patch($apiKey, '/api/lists/' . $listId, $body);
     }

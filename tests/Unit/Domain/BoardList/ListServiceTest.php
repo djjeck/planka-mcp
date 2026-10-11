@@ -55,6 +55,22 @@ final class ListServiceTest extends TestCase
         $this->service->manageList('test-api-key', 'create', null, null, 'Name');
     }
 
+    public function testManageListCreateWithClosedType(): void
+    {
+        $expected = ['item' => ['id' => 'list1', 'name' => 'Done', 'type' => 'closed']];
+
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('post')
+            ->with('test-api-key', '/api/boards/board1/lists', ['type' => 'closed', 'position' => 65536, 'name' => 'Done'])
+            ->willReturn($expected);
+
+        $this->assertSame(
+            $expected,
+            $this->service->manageList('test-api-key', 'create', 'board1', null, 'Done', null, null, 'closed'),
+        );
+    }
+
     public function testManageListUpdateSuccess(): void
     {
         $expected = ['item' => ['id' => 'list1', 'name' => 'Updated']];
@@ -85,6 +101,22 @@ final class ListServiceTest extends TestCase
     {
         $this->expectException(ValidationException::class);
         $this->service->manageList('test-api-key', 'update', null, null, 'Name');
+    }
+
+    public function testManageListUpdateRetypesToClosed(): void
+    {
+        $expected = ['item' => ['id' => 'list1', 'type' => 'closed']];
+
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('patch')
+            ->with('test-api-key', '/api/lists/list1', ['type' => 'closed'])
+            ->willReturn($expected);
+
+        $this->assertSame(
+            $expected,
+            $this->service->manageList('test-api-key', 'update', null, 'list1', null, null, null, 'closed'),
+        );
     }
 
     public function testManageListDeleteSuccess(): void

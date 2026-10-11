@@ -44,6 +44,10 @@ final class ManageListsTool extends Tool
             'toListId' => $schema->string()
                 ->nullable()
                 ->description('Target list ID for move_cards action'),
+            'type' => $schema->string()
+                ->nullable()
+                ->description('List type — "active" (default, normal kanban list) or "closed" (moving a card here sets the card\'s isClosed to true; this is how a card is marked done in Planka). Optional for create; settable on update to retype an existing list.')
+                ->enum(['active', 'closed']),
         ];
     }
 
@@ -61,9 +65,11 @@ final class ManageListsTool extends Tool
             $position = $request->get('position');
             /** @var ?string $toListId */
             $toListId = $request->get('toListId');
+            /** @var ?string $type */
+            $type = $request->get('type');
             $apiKey = $this->apiKeyProvider->getApiKey();
 
-            return Response::json($this->listService->manageList($apiKey, $action, $boardId, $listId, $name, $position, $toListId));
+            return Response::json($this->listService->manageList($apiKey, $action, $boardId, $listId, $name, $position, $toListId, $type));
         } catch (\Throwable $e) {
             return Response::error($e->getMessage());
         }

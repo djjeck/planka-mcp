@@ -55,7 +55,7 @@ final class PlankaClientTest extends TestCase
     // Header verification
     // -------------------------------------------------------------------------
 
-    public function testRequestSetsAuthorizationHeader(): void
+    public function testRequestSetsApiKeyHeader(): void
     {
         Http::fake([
             'planka.test/*' => Http::response(['item' => ['id' => '1']], 200),
@@ -65,7 +65,7 @@ final class PlankaClientTest extends TestCase
         $client->get(self::API_KEY, '/api/boards');
 
         Http::assertSent(function ($request) {
-            return $request->hasHeader('Authorization', 'Bearer ' . self::API_KEY);
+            return $request->hasHeader('X-Api-Key', self::API_KEY);
         });
     }
 
@@ -81,8 +81,8 @@ final class PlankaClientTest extends TestCase
 
         $requests = Http::recorded();
         $this->assertCount(2, $requests);
-        $this->assertSame('Bearer first-key', $requests[0][0]->header('Authorization')[0]);
-        $this->assertSame('Bearer second-key', $requests[1][0]->header('Authorization')[0]);
+        $this->assertSame('first-key', $requests[0][0]->header('X-Api-Key')[0]);
+        $this->assertSame('second-key', $requests[1][0]->header('X-Api-Key')[0]);
     }
 
     // -------------------------------------------------------------------------
@@ -569,7 +569,7 @@ final class PlankaClientTest extends TestCase
         $client->postMultipart(self::API_KEY, '/api/cards/card1/attachments', [], __FILE__, 'file.pdf');
     }
 
-    public function testPostMultipartSetsAuthorizationHeader(): void
+    public function testPostMultipartSetsApiKeyHeader(): void
     {
         Http::fake([
             'planka.test/*' => Http::response(['item' => ['id' => 'att1']], 200),
@@ -579,7 +579,7 @@ final class PlankaClientTest extends TestCase
         $client->postMultipart(self::API_KEY, '/api/cards/card1/attachments', [], __FILE__, 'file.pdf');
 
         Http::assertSent(function ($request) {
-            return $request->hasHeader('Authorization', 'Bearer ' . self::API_KEY);
+            return $request->hasHeader('X-Api-Key', self::API_KEY);
         });
     }
 

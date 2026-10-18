@@ -113,7 +113,7 @@ MCP resources are read-only, URI-addressed views of Planka data. MCP clients can
 |---|---|
 | `planka_create_card` | Create a new card, optionally with tasks |
 | `planka_get_card` | Get full card details including tasks, comments, labels, and attachments |
-| `planka_update_card` | Update a card's name, description, due date, or completion status |
+| `planka_update_card` | Update a card's name, description, due date, completion status, or cover (`coverAttachmentId`) |
 | `planka_move_card` | Move a card to a different list or position |
 | `planka_delete_card` | Permanently delete a card |
 | `planka_duplicate_card` | Duplicate an existing card into the same list |
@@ -150,7 +150,7 @@ MCP resources are read-only, URI-addressed views of Planka data. MCP clients can
 | Tool | Description |
 |---|---|
 | `planka_upload_attachment` | Upload a file attachment to a card, from a `url` on an allowed host or a `filePath` in the server's upload directory. An image uploaded to a card without a cover becomes its cover (Planka does this itself) |
-| `planka_manage_attachments` | Update or delete an attachment on a card |
+| `planka_manage_attachments` | Rename or delete an attachment on a card |
 
 ### Users
 

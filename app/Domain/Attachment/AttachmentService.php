@@ -29,14 +29,11 @@ final class AttachmentService implements AttachmentServiceInterface
     }
 
     /** @return array<mixed> */
-    public function updateAttachment(string $apiKey, string $attachmentId, ?string $name = null, ?bool $isCover = null): array
+    public function updateAttachment(string $apiKey, string $attachmentId, ?string $name = null): array
     {
         $body = [];
         if ($name !== null) {
             $body['name'] = $name;
-        }
-        if ($isCover !== null) {
-            $body['isCover'] = $isCover;
         }
 
         return $this->plankaClient->patch($apiKey, '/api/attachments/' . $attachmentId, $body);

@@ -180,6 +180,30 @@ final class CardServiceTest extends TestCase
         $this->assertSame($expected, $this->service->updateCard('test-api-key', 'card1', null, null, null, true));
     }
 
+    public function testUpdateCardSetsTheCover(): void
+    {
+        $expected = ['item' => ['id' => 'card1', 'coverAttachmentId' => 'att1']];
+
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('patch')
+            ->with('test-api-key', '/api/cards/card1', ['coverAttachmentId' => 'att1'])
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->service->updateCard('test-api-key', 'card1', coverAttachmentId: 'att1'));
+    }
+
+    public function testUpdateCardClearsTheCoverWithAnEmptyString(): void
+    {
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('patch')
+            ->with('test-api-key', '/api/cards/card1', ['coverAttachmentId' => null])
+            ->willReturn(['item' => ['id' => 'card1']]);
+
+        $this->service->updateCard('test-api-key', 'card1', coverAttachmentId: '');
+    }
+
     public function testUpdateCardWithNullsSendsEmptyBody(): void
     {
         $expected = ['item' => ['id' => 'card1']];

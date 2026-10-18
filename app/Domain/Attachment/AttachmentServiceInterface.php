@@ -13,7 +13,7 @@ interface AttachmentServiceInterface
     public function uploadAttachmentFromUrl(string $apiKey, string $cardId, string $url, string $filename): array;
 
     /** @return array<mixed> */
-    public function updateAttachment(string $apiKey, string $attachmentId, ?string $name = null, ?bool $isCover = null): array;
+    public function updateAttachment(string $apiKey, string $attachmentId, ?string $name = null): array;
 
     /** @return array<mixed> */
     public function deleteAttachment(string $apiKey, string $attachmentId): array;

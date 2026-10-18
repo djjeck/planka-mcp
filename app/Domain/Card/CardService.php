@@ -64,6 +64,7 @@ final class CardService implements CardServiceInterface
         ?string $description = null,
         ?string $dueDate = null,
         ?bool $isClosed = null,
+        ?string $coverAttachmentId = null,
     ): array {
         $body = [];
         if ($name !== null) {
@@ -77,6 +78,9 @@ final class CardService implements CardServiceInterface
         }
         if ($isClosed !== null) {
             $body['isClosed'] = $isClosed;
+        }
+        if ($coverAttachmentId !== null) {
+            $body['coverAttachmentId'] = $coverAttachmentId === '' ? null : $coverAttachmentId;
         }
 
         return $this->plankaClient->patch($apiKey, '/api/cards/' . $cardId, $body);

@@ -42,6 +42,9 @@ final class UpdateCardTool extends Tool
             'isClosed' => $schema->boolean()
                 ->nullable()
                 ->description('Close or reopen a card'),
+            'coverAttachmentId' => $schema->string()
+                ->nullable()
+                ->description('Image attachment on this card to show as its cover (empty string to clear). An image uploaded to a card without a cover becomes its cover on its own.'),
         ];
     }
 
@@ -57,14 +60,16 @@ final class UpdateCardTool extends Tool
             $dueDate = $request->get('dueDate');
             /** @var ?bool $isClosed */
             $isClosed = $request->get('isClosed');
+            /** @var ?string $coverAttachmentId */
+            $coverAttachmentId = $request->get('coverAttachmentId');
 
-            if ($name === null && $description === null && $dueDate === null && $isClosed === null) {
-                throw new ValidationException('At least one field (name, description, dueDate, or isClosed) must be provided.');
+            if ($name === null && $description === null && $dueDate === null && $isClosed === null && $coverAttachmentId === null) {
+                throw new ValidationException('At least one field (name, description, dueDate, isClosed, or coverAttachmentId) must be provided.');
             }
 
             $apiKey = $this->apiKeyProvider->getApiKey();
 
-            return Response::json($this->cardService->updateCard($apiKey, $cardId, $name, $description, $dueDate, $isClosed));
+            return Response::json($this->cardService->updateCard($apiKey, $cardId, $name, $description, $dueDate, $isClosed, $coverAttachmentId));
         } catch (\Throwable $e) {
             return Response::error($e->getMessage());
         }

@@ -15,7 +15,7 @@ use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 
 #[Name('planka_manage_attachments')]
-#[Description('Update or delete an attachment on a card.')]
+#[Description('Rename or delete an attachment on a card. To change a card\'s cover, use planka_update_card with coverAttachmentId.')]
 final class ManageAttachmentsTool extends Tool
 {
     public function __construct(
@@ -36,9 +36,6 @@ final class ManageAttachmentsTool extends Tool
             'name' => $schema->string()
                 ->nullable()
                 ->description('New name for the attachment (for update)'),
-            'isCover' => $schema->boolean()
-                ->nullable()
-                ->description('Set as card cover image (for update)'),
         ];
     }
 
@@ -50,8 +47,6 @@ final class ManageAttachmentsTool extends Tool
             $attachmentId = $request->get('attachmentId');
             /** @var ?string $name */
             $name = $request->get('name');
-            /** @var ?bool $isCover */
-            $isCover = $request->get('isCover');
             $apiKey = $this->apiKeyProvider->getApiKey();
 
             $result = match ($action) {
@@ -59,7 +54,6 @@ final class ManageAttachmentsTool extends Tool
                     $apiKey,
                     $attachmentId ?? throw new ValidationException('attachmentId required for update'),
                     $name,
-                    $isCover,
                 ),
                 'delete' => $this->attachmentService->deleteAttachment(
                     $apiKey,

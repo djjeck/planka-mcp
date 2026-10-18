@@ -83,19 +83,6 @@ final class AttachmentServiceTest extends TestCase
         $this->service->uploadAttachment('test-api-key', 'card1', '/tmp/file.pdf', 'file.pdf');
     }
 
-    public function testUpdateAttachmentWithNameAndCover(): void
-    {
-        $expected = ['item' => ['id' => 'att1', 'name' => 'renamed.pdf', 'isCover' => true]];
-
-        $this->plankaClient
-            ->expects($this->once())
-            ->method('patch')
-            ->with('test-api-key', '/api/attachments/att1', ['name' => 'renamed.pdf', 'isCover' => true])
-            ->willReturn($expected);
-
-        $this->assertSame($expected, $this->service->updateAttachment('test-api-key', 'att1', 'renamed.pdf', true));
-    }
-
     public function testUpdateAttachmentWithNameOnly(): void
     {
         $expected = ['item' => ['id' => 'att1', 'name' => 'renamed.pdf']];
@@ -107,19 +94,6 @@ final class AttachmentServiceTest extends TestCase
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->service->updateAttachment('test-api-key', 'att1', 'renamed.pdf'));
-    }
-
-    public function testUpdateAttachmentWithCoverOnly(): void
-    {
-        $expected = ['item' => ['id' => 'att1', 'isCover' => true]];
-
-        $this->plankaClient
-            ->expects($this->once())
-            ->method('patch')
-            ->with('test-api-key', '/api/attachments/att1', ['isCover' => true])
-            ->willReturn($expected);
-
-        $this->assertSame($expected, $this->service->updateAttachment('test-api-key', 'att1', null, true));
     }
 
     public function testUpdateAttachmentWithNullsSendsEmptyBody(): void

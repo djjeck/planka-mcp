@@ -30,6 +30,7 @@ interface CardServiceInterface
         ?string $description = null,
         ?string $dueDate = null,
         ?bool $isClosed = null,
+        ?string $coverAttachmentId = null,
     ): array;
 
     /** @return array<mixed> */

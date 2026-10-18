@@ -39,6 +39,19 @@ final class UpdateCardToolTest extends TestCase
         $this->assertFalse($response->isError());
     }
 
+    public function testHandlePassesTheCoverAttachmentAlone(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->cardService
+            ->expects($this->once())
+            ->method('updateCard')
+            ->with('test-key', 'c1', null, null, null, null, 'att1')
+            ->willReturn(['item' => ['id' => 'c1']]);
+
+        $response = $this->tool->handle($this->makeRequest(['cardId' => 'c1', 'coverAttachmentId' => 'att1']));
+        $this->assertFalse($response->isError());
+    }
+
     public function testHandleNoFieldsProvided(): void
     {
         $response = $this->tool->handle($this->makeRequest(['cardId' => 'c1']));

@@ -17,6 +17,12 @@ class AppServiceProvider extends ServiceProvider
             );
         });
 
+        $this->app->bind(\App\Http\RemoteFileFetcherInterface::class, function ($app) {
+            return new \App\Http\RemoteFileFetcher(
+                allowedHosts: config('planka.upload_url_allowed_hosts'),
+            );
+        });
+
         $this->app->bind(\App\Http\ApiKeyProviderInterface::class, \App\Http\ApiKeyProvider::class);
         $this->app->bind(\App\Domain\Action\ActionServiceInterface::class, \App\Domain\Action\ActionService::class);
         $this->app->bind(\App\Domain\Attachment\AttachmentServiceInterface::class, \App\Domain\Attachment\AttachmentService::class);

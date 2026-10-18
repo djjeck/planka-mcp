@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Tests\Unit\Domain\Attachment;
 
 use App\Domain\Attachment\AttachmentService;
+use App\Exception\ValidationException;
+use App\Http\RemoteFileFetcherInterface;
 use App\Planka\Exception\AuthenticationException;
 use App\Planka\Exception\PlankaApiException;
 use App\Planka\PlankaClientInterface;
@@ -14,12 +16,14 @@ use PHPUnit\Framework\TestCase;
 final class AttachmentServiceTest extends TestCase
 {
     private PlankaClientInterface&MockObject $plankaClient;
+    private RemoteFileFetcherInterface&MockObject $remoteFileFetcher;
     private AttachmentService $service;
 
     protected function setUp(): void
     {
         $this->plankaClient = $this->createMock(PlankaClientInterface::class);
-        $this->service = new AttachmentService($this->plankaClient);
+        $this->remoteFileFetcher = $this->createMock(RemoteFileFetcherInterface::class);
+        $this->service = new AttachmentService($this->plankaClient, $this->remoteFileFetcher);
     }
 
     public function testUploadAttachmentSuccess(): void
@@ -33,6 +37,36 @@ final class AttachmentServiceTest extends TestCase
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->service->uploadAttachment('test-api-key', 'card1', '/tmp/file.pdf', 'file.pdf'));
+    }
+
+    public function testUploadAttachmentFromUrlUploadsTheDownloadedBytes(): void
+    {
+        $expected = ['item' => ['id' => 'att1', 'name' => 'photo.jpg']];
+
+        $this->remoteFileFetcher
+            ->expects($this->once())
+            ->method('fetch')
+            ->with('http://human-dm:8900/files/abc.sig')
+            ->willReturn('jpeg-bytes');
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('postMultipartContents')
+            ->with('test-api-key', '/api/cards/card1/attachments', [], 'jpeg-bytes', 'photo.jpg')
+            ->willReturn($expected);
+
+        $this->assertSame(
+            $expected,
+            $this->service->uploadAttachmentFromUrl('test-api-key', 'card1', 'http://human-dm:8900/files/abc.sig', 'photo.jpg'),
+        );
+    }
+
+    public function testUploadAttachmentFromUrlUploadsNothingWhenTheDownloadFails(): void
+    {
+        $this->remoteFileFetcher->method('fetch')->willThrowException(new ValidationException('HTTP 404'));
+        $this->plankaClient->expects($this->never())->method('postMultipartContents');
+
+        $this->expectException(ValidationException::class);
+        $this->service->uploadAttachmentFromUrl('test-api-key', 'card1', 'http://human-dm:8900/files/x', 'photo.jpg');
     }
 
     public function testUploadAttachmentPropagatesAuthException(): void

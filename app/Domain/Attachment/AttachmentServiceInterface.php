@@ -10,6 +10,9 @@ interface AttachmentServiceInterface
     public function uploadAttachment(string $apiKey, string $cardId, string $filePath, string $filename): array;
 
     /** @return array<mixed> */
+    public function uploadAttachmentFromUrl(string $apiKey, string $cardId, string $url, string $filename): array;
+
+    /** @return array<mixed> */
     public function updateAttachment(string $apiKey, string $attachmentId, ?string $name = null, ?bool $isCover = null): array;
 
     /** @return array<mixed> */

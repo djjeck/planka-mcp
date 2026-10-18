@@ -149,7 +149,7 @@ MCP resources are read-only, URI-addressed views of Planka data. MCP clients can
 
 | Tool | Description |
 |---|---|
-| `planka_upload_attachment` | Upload a file attachment to a card |
+| `planka_upload_attachment` | Upload a file attachment to a card, from a `url` on an allowed host or a `filePath` in the server's upload directory. An image uploaded to a card without a cover becomes its cover (Planka does this itself) |
 | `planka_manage_attachments` | Update or delete an attachment on a card |
 
 ### Users
@@ -255,6 +255,7 @@ docker run -d \
 | `REDIS_HOST` | No | Redis hostname — defaults to `redis` in Docker Compose, `127.0.0.1` otherwise |
 | `REDIS_PORT` | No | Redis port — defaults to `6379` |
 | `REDIS_PASSWORD` | No | Redis password — defaults to none |
+| `PLANKA_UPLOAD_URL_ALLOWED_HOSTS` | No | Comma-separated hosts `planka_upload_attachment` may download a `url` from (e.g. `human-dm`). Empty (default): uploads by URL are refused. Redirects are not followed and files are capped at 25 MB |
 
 The Planka API key is **never** configured server-side. It is passed by each client on every request (see [Authentication](#authentication) below).
 

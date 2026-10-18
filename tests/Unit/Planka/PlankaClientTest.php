@@ -583,4 +583,47 @@ final class PlankaClientTest extends TestCase
         });
     }
 
+    // -------------------------------------------------------------------------
+    // postMultipartContents()
+    // -------------------------------------------------------------------------
+
+    public function testPostMultipartContentsAttachesTheBytesGiven(): void
+    {
+        Http::fake([
+            'planka.test/*' => Http::response(['item' => ['id' => 'att1']], 200),
+        ]);
+
+        $client = new PlankaClient(self::PLANKA_URL);
+        $result = $client->postMultipartContents(self::API_KEY, '/api/cards/card1/attachments', [], 'jpeg-bytes', 'photo.jpg');
+
+        $this->assertSame(['item' => ['id' => 'att1']], $result);
+        Http::assertSent(function ($request) {
+            return $request->url() === 'http://planka.test/api/cards/card1/attachments'
+                && $request->isMultipart()
+                && $request->hasFile('file', 'jpeg-bytes', 'photo.jpg')
+                && $request->hasHeader('X-Api-Key', self::API_KEY);
+        });
+    }
+
+    public function testPostMultipartContentsRejectsPathTraversal(): void
+    {
+        $client = new PlankaClient(self::PLANKA_URL);
+
+        $this->expectException(ValidationException::class);
+        $this->expectExceptionMessage('Invalid resource path.');
+
+        $client->postMultipartContents(self::API_KEY, '/api/cards/../admin/attachments', [], 'bytes', 'f.jpg');
+    }
+
+    public function testPostMultipartContentsWrapsConnectionErrors(): void
+    {
+        Http::fake(fn () => throw new \Illuminate\Http\Client\ConnectionException('refused'));
+
+        $client = new PlankaClient(self::PLANKA_URL);
+
+        $this->expectException(PlankaApiException::class);
+        $this->expectExceptionMessage('Unable to connect to Planka API.');
+
+        $client->postMultipartContents(self::API_KEY, '/api/cards/card1/attachments', [], 'bytes', 'f.jpg');
+    }
 }

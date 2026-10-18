@@ -34,4 +34,12 @@ interface PlankaClientInterface
      * @return array<mixed>
      */
     public function postMultipart(string $apiKey, string $path, array $fields, string $filePath, string $filename): array;
+
+    /**
+     * Like postMultipart, with the file's bytes in hand rather than on disk.
+     *
+     * @param array<string, mixed> $fields
+     * @return array<mixed>
+     */
+    public function postMultipartContents(string $apiKey, string $path, array $fields, string $contents, string $filename): array;
 }

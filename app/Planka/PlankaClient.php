@@ -56,13 +56,29 @@ final class PlankaClient implements PlankaClientInterface
      */
     public function postMultipart(string $apiKey, string $path, array $fields, string $filePath, string $filename): array
     {
-        if (str_contains($path, '..') || str_contains($path, "\0")) {
-            throw new ValidationException('Invalid resource path.');
-        }
+        $this->assertResourcePath($path);
 
         if (str_contains($filePath, "\0")) {
             throw new ValidationException('Invalid file path.');
         }
+
+        $contents = file_get_contents($filePath);
+        // @codeCoverageIgnoreStart
+        if ($contents === false) {
+            throw new ValidationException('Unable to read file: ' . $filePath);
+        }
+        // @codeCoverageIgnoreEnd
+
+        return $this->postMultipartContents($apiKey, $path, $fields, $contents, $filename);
+    }
+
+    /**
+     * @param array<string, mixed> $fields
+     * @return array<mixed>
+     */
+    public function postMultipartContents(string $apiKey, string $path, array $fields, string $contents, string $filename): array
+    {
+        $this->assertResourcePath($path);
 
         $headers = [
             'X-Api-Key' => $apiKey,
@@ -72,13 +88,6 @@ final class PlankaClient implements PlankaClientInterface
         $url = rtrim($this->plankaUrl, '/') . $path;
 
         try {
-            $contents = file_get_contents($filePath);
-            // @codeCoverageIgnoreStart
-            if ($contents === false) {
-                throw new ValidationException('Unable to read file: ' . $filePath);
-            }
-            // @codeCoverageIgnoreEnd
-
             $response = Http::withHeaders($headers)
                 ->attach('file', $contents, $filename)
                 ->post($url, $fields);
@@ -90,6 +99,13 @@ final class PlankaClient implements PlankaClientInterface
                 0,
                 $e,
             );
+        }
+    }
+
+    private function assertResourcePath(string $path): void
+    {
+        if (str_contains($path, '..') || str_contains($path, "\0")) {
+            throw new ValidationException('Invalid resource path.');
         }
     }
 

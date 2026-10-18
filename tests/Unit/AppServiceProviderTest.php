@@ -18,6 +18,17 @@ final class AppServiceProviderTest extends TestCase
         $this->assertInstanceOf(PlankaClient::class, $client);
     }
 
+    public function testRemoteFileFetcherBindingUsesTheConfiguredHosts(): void
+    {
+        config(['planka.upload_url_allowed_hosts' => ['human-dm']]);
+        \Illuminate\Support\Facades\Http::fake(['*' => \Illuminate\Support\Facades\Http::response('bytes', 200)]);
+
+        $fetcher = $this->app->make(\App\Http\RemoteFileFetcherInterface::class);
+
+        $this->assertInstanceOf(\App\Http\RemoteFileFetcher::class, $fetcher);
+        $this->assertSame('bytes', $fetcher->fetch('http://human-dm:8900/files/x'));
+    }
+
     public function testBootCreatesUploadDirectoryIfMissing(): void
     {
         $uploadDir = storage_path('app/uploads');

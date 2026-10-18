@@ -17,7 +17,7 @@ final class AttachmentService implements AttachmentServiceInterface
     /** @return array<mixed> */
     public function uploadAttachment(string $apiKey, string $cardId, string $filePath, string $filename): array
     {
-        return $this->plankaClient->postMultipart($apiKey, '/api/cards/' . $cardId . '/attachments', [], $filePath, $filename);
+        return $this->plankaClient->postMultipart($apiKey, '/api/cards/' . $cardId . '/attachments', self::fileFields($filename), $filePath, $filename);
     }
 
     /** @return array<mixed> */
@@ -25,7 +25,18 @@ final class AttachmentService implements AttachmentServiceInterface
     {
         $contents = $this->remoteFileFetcher->fetch($url);
 
-        return $this->plankaClient->postMultipartContents($apiKey, '/api/cards/' . $cardId . '/attachments', [], $contents, $filename);
+        return $this->plankaClient->postMultipartContents($apiKey, '/api/cards/' . $cardId . '/attachments', self::fileFields($filename), $contents, $filename);
+    }
+
+    /**
+     * Planka 2's attachments/create requires the attachment's type and name as form fields next
+     * to the file (a link attachment is type "link" with a url instead); without them it's a 400.
+     *
+     * @return array{type: string, name: string}
+     */
+    private static function fileFields(string $filename): array
+    {
+        return ['type' => 'file', 'name' => mb_substr($filename, 0, 128)];
     }
 
     /** @return array<mixed> */

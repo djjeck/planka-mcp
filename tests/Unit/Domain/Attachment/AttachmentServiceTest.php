@@ -33,7 +33,7 @@ final class AttachmentServiceTest extends TestCase
         $this->plankaClient
             ->expects($this->once())
             ->method('postMultipart')
-            ->with('test-api-key', '/api/cards/card1/attachments', [], '/tmp/file.pdf', 'file.pdf')
+            ->with('test-api-key', '/api/cards/card1/attachments', ['type' => 'file', 'name' => 'file.pdf'], '/tmp/file.pdf', 'file.pdf')
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->service->uploadAttachment('test-api-key', 'card1', '/tmp/file.pdf', 'file.pdf'));
@@ -51,7 +51,7 @@ final class AttachmentServiceTest extends TestCase
         $this->plankaClient
             ->expects($this->once())
             ->method('postMultipartContents')
-            ->with('test-api-key', '/api/cards/card1/attachments', [], 'jpeg-bytes', 'photo.jpg')
+            ->with('test-api-key', '/api/cards/card1/attachments', ['type' => 'file', 'name' => 'photo.jpg'], 'jpeg-bytes', 'photo.jpg')
             ->willReturn($expected);
 
         $this->assertSame(
@@ -67,6 +67,20 @@ final class AttachmentServiceTest extends TestCase
 
         $this->expectException(ValidationException::class);
         $this->service->uploadAttachmentFromUrl('test-api-key', 'card1', 'http://human-dm:8900/files/x', 'photo.jpg');
+    }
+
+    public function testUploadAttachmentCapsTheNameAtPlankasLimit(): void
+    {
+        $long = str_repeat('a', 200) . '.jpg';
+
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('postMultipartContents')
+            ->with('k', '/api/cards/card1/attachments', ['type' => 'file', 'name' => mb_substr($long, 0, 128)], 'bytes', $long)
+            ->willReturn([]);
+        $this->remoteFileFetcher->method('fetch')->willReturn('bytes');
+
+        $this->service->uploadAttachmentFromUrl('k', 'card1', 'http://human-dm/files/x', $long);
     }
 
     public function testUploadAttachmentPropagatesAuthException(): void

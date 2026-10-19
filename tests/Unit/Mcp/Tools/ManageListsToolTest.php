@@ -39,6 +39,18 @@ final class ManageListsToolTest extends TestCase
         $this->assertFalse($response->isError());
     }
 
+    public function testCreatePositionAsString(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->listService->expects($this->once())
+            ->method('manageList')
+            ->with('test-key', 'create', 'b1', null, 'To Do', 65536)
+            ->willReturn(['item' => ['id' => 'l1']]);
+
+        $response = $this->tool->handle($this->makeRequest(['action' => 'create', 'boardId' => 'b1', 'name' => 'To Do', 'position' => '65,536']));
+        $this->assertFalse($response->isError());
+    }
+
     public function testDeleteSuccess(): void
     {
         $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');

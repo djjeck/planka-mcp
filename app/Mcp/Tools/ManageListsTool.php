@@ -61,8 +61,7 @@ final class ManageListsTool extends Tool
             $listId = $request->get('listId');
             /** @var ?string $name */
             $name = $request->get('name');
-            /** @var ?int $position */
-            $position = $request->get('position');
+            $position = IntegerArgument::from($request->get('position'), 'position');
             /** @var ?string $toListId */
             $toListId = $request->get('toListId');
             /** @var ?string $type */

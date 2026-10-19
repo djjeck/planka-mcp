@@ -42,8 +42,7 @@ final class MoveCardTool extends Tool
         try {
             $cardId = (string) $request->get('cardId', '');
             $listId = (string) $request->get('listId', '');
-            /** @var ?int $position */
-            $position = $request->get('position');
+            $position = IntegerArgument::from($request->get('position'), 'position');
             $apiKey = $this->apiKeyProvider->getApiKey();
 
             return Response::json($this->cardService->moveCard($apiKey, $cardId, $listId, $position));

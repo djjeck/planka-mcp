@@ -55,8 +55,7 @@ final class ManageBoardsTool extends Tool
             $boardId = $request->get('boardId');
             /** @var ?string $name */
             $name = $request->get('name');
-            /** @var ?int $position */
-            $position = $request->get('position');
+            $position = IntegerArgument::from($request->get('position'), 'position');
             $apiKey = $this->apiKeyProvider->getApiKey();
 
             $result = match ($action) {

@@ -39,6 +39,18 @@ final class ManageBoardsToolTest extends TestCase
         $this->assertFalse($response->isError());
     }
 
+    public function testCreatePositionAsString(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->boardService->expects($this->once())
+            ->method('createBoard')
+            ->with('test-key', 'p1', 'Board', 3)
+            ->willReturn(['item' => ['id' => 'b1']]);
+
+        $response = $this->tool->handle($this->makeRequest(['action' => 'create', 'projectId' => 'p1', 'name' => 'Board', 'position' => '3']));
+        $this->assertFalse($response->isError());
+    }
+
     public function testCreateMissingProjectId(): void
     {
         $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');

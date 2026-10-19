@@ -39,6 +39,27 @@ final class MoveCardToolTest extends TestCase
         $this->assertFalse($response->isError());
     }
 
+    public function testHandlePositionAsString(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->cardService->expects($this->once())
+            ->method('moveCard')
+            ->with('test-key', 'c1', 'l2', 65536)
+            ->willReturn(['item' => ['id' => 'c1']]);
+
+        $response = $this->tool->handle($this->makeRequest(['cardId' => 'c1', 'listId' => 'l2', 'position' => '65536']));
+        $this->assertFalse($response->isError());
+    }
+
+    public function testHandlePositionNotANumber(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->cardService->expects($this->never())->method('moveCard');
+
+        $response = $this->tool->handle($this->makeRequest(['cardId' => 'c1', 'listId' => 'l2', 'position' => 'top']));
+        $this->assertTrue($response->isError());
+    }
+
     public function testHandleAuthError(): void
     {
         $this->apiKeyProvider->method('getApiKey')->willThrowException(new ValidationException('No API key'));

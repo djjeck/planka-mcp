@@ -54,7 +54,9 @@ final class CardService implements CardServiceInterface
      * Update a card's properties.
      *
      * For $description and $dueDate: null means "no change", empty string means "clear the field".
+     * For $stopwatch (Planka 2's {startedAt, total}): null means "no change", [] removes it.
      *
+     * @param array{startedAt: ?string, total: int}|array{}|null $stopwatch
      * @return array<mixed>
      */
     public function updateCard(
@@ -65,6 +67,7 @@ final class CardService implements CardServiceInterface
         ?string $dueDate = null,
         ?bool $isClosed = null,
         ?string $coverAttachmentId = null,
+        ?array $stopwatch = null,
     ): array {
         $body = [];
         if ($name !== null) {
@@ -81,6 +84,9 @@ final class CardService implements CardServiceInterface
         }
         if ($coverAttachmentId !== null) {
             $body['coverAttachmentId'] = $coverAttachmentId === '' ? null : $coverAttachmentId;
+        }
+        if ($stopwatch !== null) {
+            $body['stopwatch'] = $stopwatch === [] ? null : $stopwatch;
         }
 
         return $this->plankaClient->patch($apiKey, '/api/cards/' . $cardId, $body);

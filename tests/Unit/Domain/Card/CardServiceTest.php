@@ -204,6 +204,30 @@ final class CardServiceTest extends TestCase
         $this->service->updateCard('test-api-key', 'card1', coverAttachmentId: '');
     }
 
+    public function testUpdateCardSetsTheStopwatch(): void
+    {
+        $stopwatch = ['startedAt' => '2026-10-20T14:00:00.000Z', 'total' => 600];
+
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('patch')
+            ->with('test-api-key', '/api/cards/card1', ['stopwatch' => $stopwatch])
+            ->willReturn(['item' => ['id' => 'card1']]);
+
+        $this->service->updateCard('test-api-key', 'card1', stopwatch: $stopwatch);
+    }
+
+    public function testUpdateCardRemovesTheStopwatchWithAnEmptyArray(): void
+    {
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('patch')
+            ->with('test-api-key', '/api/cards/card1', ['stopwatch' => null])
+            ->willReturn(['item' => ['id' => 'card1']]);
+
+        $this->service->updateCard('test-api-key', 'card1', stopwatch: []);
+    }
+
     public function testUpdateCardWithNullsSendsEmptyBody(): void
     {
         $expected = ['item' => ['id' => 'card1']];

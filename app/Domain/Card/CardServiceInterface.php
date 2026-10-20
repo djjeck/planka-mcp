@@ -22,7 +22,10 @@ interface CardServiceInterface
     /** @return array<mixed> */
     public function getCard(string $apiKey, string $cardId): array;
 
-    /** @return array<mixed> */
+    /**
+     * @param array{startedAt: ?string, total: int}|array{}|null $stopwatch null leaves it, [] removes it
+     * @return array<mixed>
+     */
     public function updateCard(
         string $apiKey,
         string $cardId,
@@ -31,6 +34,7 @@ interface CardServiceInterface
         ?string $dueDate = null,
         ?bool $isClosed = null,
         ?string $coverAttachmentId = null,
+        ?array $stopwatch = null,
     ): array;
 
     /** @return array<mixed> */

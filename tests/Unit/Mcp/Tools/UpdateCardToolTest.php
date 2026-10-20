@@ -52,6 +52,44 @@ final class UpdateCardToolTest extends TestCase
         $this->assertFalse($response->isError());
     }
 
+    public function testHandlePassesTheStopwatchAlone(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->cardService
+            ->expects($this->once())
+            ->method('updateCard')
+            ->with('test-key', 'c1', null, null, null, null, null, ['startedAt' => null, 'total' => 90])
+            ->willReturn(['item' => ['id' => 'c1']]);
+
+        $response = $this->tool->handle($this->makeRequest([
+            'cardId' => 'c1',
+            'stopwatch' => ['startedAt' => null, 'total' => '90'],
+        ]));
+        $this->assertFalse($response->isError());
+    }
+
+    public function testHandleLeavesTheStopwatchAloneWhenNull(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->cardService
+            ->expects($this->once())
+            ->method('updateCard')
+            ->with('test-key', 'c1', 'Renamed', null, null, null, null, null)
+            ->willReturn(['item' => ['id' => 'c1']]);
+
+        $response = $this->tool->handle($this->makeRequest(['cardId' => 'c1', 'name' => 'Renamed', 'stopwatch' => null]));
+        $this->assertFalse($response->isError());
+    }
+
+    public function testHandleRejectsAnInvalidStopwatch(): void
+    {
+        $this->cardService->expects($this->never())->method('updateCard');
+
+        $response = $this->tool->handle($this->makeRequest(['cardId' => 'c1', 'stopwatch' => ['total' => 5]]));
+        $this->assertTrue($response->isError());
+        $this->assertStringContainsString('needs both startedAt', (string) $response->content());
+    }
+
     public function testHandleNoFieldsProvided(): void
     {
         $response = $this->tool->handle($this->makeRequest(['cardId' => 'c1']));

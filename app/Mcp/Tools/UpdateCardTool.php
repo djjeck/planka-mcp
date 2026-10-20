@@ -15,7 +15,7 @@ use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 
 #[Name('planka_update_card')]
-#[Description("Update a card's properties (name, description, due date, completion status).")]
+#[Description("Update a card's properties (name, description, due date, completion status, cover, stopwatch).")]
 final class UpdateCardTool extends Tool
 {
     public function __construct(
@@ -45,6 +45,16 @@ final class UpdateCardTool extends Tool
             'coverAttachmentId' => $schema->string()
                 ->nullable()
                 ->description('Image attachment on this card to show as its cover (empty string to clear). An image uploaded to a card without a cover becomes its cover on its own.'),
+            'stopwatch' => $schema->object([
+                'startedAt' => $schema->string()
+                    ->nullable()
+                    ->format('date-time')
+                    ->description('When it was started (ISO 8601), or null while stopped'),
+                'total' => $schema->integer()
+                    ->description('Seconds it ran before startedAt (all of its time while stopped)'),
+            ])
+                ->nullable()
+                ->description('The card\'s stopwatch, replaced whole: start it with startedAt now and total kept, stop it with startedAt null and the elapsed seconds added to total. An empty object {} removes it.'),
         ];
     }
 
@@ -62,14 +72,15 @@ final class UpdateCardTool extends Tool
             $isClosed = $request->get('isClosed');
             /** @var ?string $coverAttachmentId */
             $coverAttachmentId = $request->get('coverAttachmentId');
+            $stopwatch = StopwatchArgument::from($request->get('stopwatch'));
 
-            if ($name === null && $description === null && $dueDate === null && $isClosed === null && $coverAttachmentId === null) {
-                throw new ValidationException('At least one field (name, description, dueDate, isClosed, or coverAttachmentId) must be provided.');
+            if ($name === null && $description === null && $dueDate === null && $isClosed === null && $coverAttachmentId === null && $stopwatch === null) {
+                throw new ValidationException('At least one field (name, description, dueDate, isClosed, coverAttachmentId, or stopwatch) must be provided.');
             }
 
             $apiKey = $this->apiKeyProvider->getApiKey();
 
-            return Response::json($this->cardService->updateCard($apiKey, $cardId, $name, $description, $dueDate, $isClosed, $coverAttachmentId));
+            return Response::json($this->cardService->updateCard($apiKey, $cardId, $name, $description, $dueDate, $isClosed, $coverAttachmentId, $stopwatch));
         } catch (\Throwable $e) {
             return Response::error($e->getMessage());
         }

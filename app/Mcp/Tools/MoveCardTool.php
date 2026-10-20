@@ -14,7 +14,7 @@ use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 
 #[Name('planka_move_card')]
-#[Description('Move a card to a different list or position. Use this for workflow transitions.')]
+#[Description('Move a card to a different list or position, on its board or another one. Use this for workflow transitions.')]
 final class MoveCardTool extends Tool
 {
     public function __construct(
@@ -34,6 +34,9 @@ final class MoveCardTool extends Tool
             'position' => $schema->integer()
                 ->nullable()
                 ->description('Position in the list (lower = higher). Default: end of list'),
+            'boardId' => $schema->string()
+                ->nullable()
+                ->description('Board of the target list, when it is on another board than the card (Planka needs both to move a card across boards)'),
         ];
     }
 
@@ -43,9 +46,16 @@ final class MoveCardTool extends Tool
             $cardId = (string) $request->get('cardId', '');
             $listId = (string) $request->get('listId', '');
             $position = IntegerArgument::from($request->get('position'), 'position');
+            $boardId = $request->get('boardId');
             $apiKey = $this->apiKeyProvider->getApiKey();
 
-            return Response::json($this->cardService->moveCard($apiKey, $cardId, $listId, $position));
+            return Response::json($this->cardService->moveCard(
+                $apiKey,
+                $cardId,
+                $listId,
+                $position,
+                $boardId === null ? null : (string) $boardId,
+            ));
         } catch (\Throwable $e) {
             return Response::error($e->getMessage());
         }

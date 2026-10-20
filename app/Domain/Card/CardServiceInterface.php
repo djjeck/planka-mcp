@@ -39,6 +39,7 @@ interface CardServiceInterface
         string $cardId,
         string $listId,
         ?int $position = null,
+        ?string $boardId = null,
     ): array;
 
     /** @return array<mixed> */

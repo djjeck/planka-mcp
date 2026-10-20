@@ -114,7 +114,7 @@ MCP resources are read-only, URI-addressed views of Planka data. MCP clients can
 | `planka_create_card` | Create a new card, optionally with tasks |
 | `planka_get_card` | Get full card details including tasks, comments, labels, and attachments |
 | `planka_update_card` | Update a card's name, description, due date, completion status, or cover (`coverAttachmentId`) |
-| `planka_move_card` | Move a card to a different list or position |
+| `planka_move_card` | Move a card to a different list or position, also on another board (`boardId`) |
 | `planka_delete_card` | Permanently delete a card |
 | `planka_duplicate_card` | Duplicate an existing card into the same list |
 | `planka_manage_card_membership` | Add or remove a user as a member of a card |

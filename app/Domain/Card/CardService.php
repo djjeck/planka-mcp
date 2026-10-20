@@ -92,8 +92,13 @@ final class CardService implements CardServiceInterface
         string $cardId,
         string $listId,
         ?int $position = null,
+        ?string $boardId = null,
     ): array {
         $body = ['listId' => $listId, 'position' => $position ?? 65536];
+        // Planka 2 moves a card to another board only when given the board too.
+        if ($boardId !== null && $boardId !== '') {
+            $body['boardId'] = $boardId;
+        }
 
         return $this->plankaClient->patch($apiKey, '/api/cards/' . $cardId, $body);
     }

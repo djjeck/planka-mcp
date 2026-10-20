@@ -257,6 +257,19 @@ final class CardServiceTest extends TestCase
         $this->assertSame($expected, $this->service->moveCard('test-api-key', 'card1', 'list2', 100));
     }
 
+    public function testMoveCardToAnotherBoard(): void
+    {
+        $expected = ['item' => ['id' => 'card1']];
+
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('patch')
+            ->with('test-api-key', '/api/cards/card1', ['listId' => 'list2', 'position' => 65536, 'boardId' => 'board2'])
+            ->willReturn($expected);
+
+        $this->assertSame($expected, $this->service->moveCard('test-api-key', 'card1', 'list2', null, 'board2'));
+    }
+
     public function testMoveCardPropagatesAuthException(): void
     {
         $this->plankaClient->method('patch')->willThrowException(new AuthenticationException('Unauthorized'));

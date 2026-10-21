@@ -48,6 +48,45 @@ final class GetActionsToolTest extends TestCase
         $this->assertFalse($response->isError());
     }
 
+    public function testBoardActionsPassBeforeId(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->actionService
+            ->expects($this->once())
+            ->method('getBoardActions')
+            ->with('test-key', 'b1', 'a50')
+            ->willReturn(['items' => []]);
+
+        $response = $this->tool->handle($this->makeRequest(['type' => 'board', 'id' => 'b1', 'beforeId' => 'a50']));
+        $this->assertFalse($response->isError());
+    }
+
+    public function testCardActionsPassBeforeId(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->actionService
+            ->expects($this->once())
+            ->method('getCardActions')
+            ->with('test-key', 'c1', 'a50')
+            ->willReturn(['items' => []]);
+
+        $response = $this->tool->handle($this->makeRequest(['type' => 'card', 'id' => 'c1', 'beforeId' => 'a50']));
+        $this->assertFalse($response->isError());
+    }
+
+    public function testNullBeforeIdIsTheNewest(): void
+    {
+        $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');
+        $this->actionService
+            ->expects($this->once())
+            ->method('getBoardActions')
+            ->with('test-key', 'b1', null)
+            ->willReturn(['items' => []]);
+
+        $response = $this->tool->handle($this->makeRequest(['type' => 'board', 'id' => 'b1', 'beforeId' => null]));
+        $this->assertFalse($response->isError());
+    }
+
     public function testInvalidType(): void
     {
         $this->apiKeyProvider->method('getApiKey')->willReturn('test-key');

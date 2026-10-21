@@ -13,14 +13,24 @@ final class ActionService implements ActionServiceInterface
     ) {}
 
     /** @return array<mixed> */
-    public function getBoardActions(string $apiKey, string $boardId): array
+    public function getBoardActions(string $apiKey, string $boardId, ?string $beforeId = null): array
     {
-        return $this->plankaClient->get($apiKey, '/api/boards/' . $boardId . '/actions');
+        return $this->plankaClient->get($apiKey, '/api/boards/' . $boardId . '/actions', self::page($beforeId));
     }
 
     /** @return array<mixed> */
-    public function getCardActions(string $apiKey, string $cardId): array
+    public function getCardActions(string $apiKey, string $cardId, ?string $beforeId = null): array
     {
-        return $this->plankaClient->get($apiKey, '/api/cards/' . $cardId . '/actions');
+        return $this->plankaClient->get($apiKey, '/api/cards/' . $cardId . '/actions', self::page($beforeId));
+    }
+
+    /**
+     * Planka returns the newest 50 actions; beforeId asks for the 50 before that action.
+     *
+     * @return array<string, string>
+     */
+    private static function page(?string $beforeId): array
+    {
+        return $beforeId === null || $beforeId === '' ? [] : ['beforeId' => $beforeId];
     }
 }

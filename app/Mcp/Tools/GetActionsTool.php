@@ -15,7 +15,7 @@ use Laravel\Mcp\Server\Attributes\Name;
 use Laravel\Mcp\Server\Tool;
 
 #[Name('planka_get_actions')]
-#[Description('Get the activity log (actions) for a board or card.')]
+#[Description('Get the activity log (actions) for a board or card, newest first, 50 at a time. To page back, pass the id of the oldest action received as beforeId.')]
 final class GetActionsTool extends Tool
 {
     public function __construct(
@@ -33,6 +33,9 @@ final class GetActionsTool extends Tool
             'id' => $schema->string()
                 ->required()
                 ->description('The board ID or card ID'),
+            'beforeId' => $schema->string()
+                ->nullable()
+                ->description('Return the actions before this action ID (the oldest one from the previous page). Default: the newest'),
         ];
     }
 
@@ -41,11 +44,13 @@ final class GetActionsTool extends Tool
         try {
             $type = (string) $request->get('type', '');
             $id = (string) $request->get('id', '');
+            $beforeId = $request->get('beforeId');
+            $beforeId = $beforeId === null ? null : (string) $beforeId;
             $apiKey = $this->apiKeyProvider->getApiKey();
 
             $result = match ($type) {
-                'board' => $this->actionService->getBoardActions($apiKey, $id),
-                'card' => $this->actionService->getCardActions($apiKey, $id),
+                'board' => $this->actionService->getBoardActions($apiKey, $id, $beforeId),
+                'card' => $this->actionService->getCardActions($apiKey, $id, $beforeId),
                 default => throw new ValidationException(sprintf('Invalid type "%s". Must be: board, card', $type)),
             };
 

@@ -29,10 +29,32 @@ final class ActionServiceTest extends TestCase
         $this->plankaClient
             ->expects($this->once())
             ->method('get')
-            ->with('test-api-key', '/api/boards/board1/actions')
+            ->with('test-api-key', '/api/boards/board1/actions', [])
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->service->getBoardActions('test-api-key', 'board1'));
+    }
+
+    public function testGetBoardActionsPagesBack(): void
+    {
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('get')
+            ->with('test-api-key', '/api/boards/board1/actions', ['beforeId' => 'action50'])
+            ->willReturn(['items' => []]);
+
+        $this->service->getBoardActions('test-api-key', 'board1', 'action50');
+    }
+
+    public function testGetBoardActionsEmptyBeforeIdIsTheNewest(): void
+    {
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('get')
+            ->with('test-api-key', '/api/boards/board1/actions', [])
+            ->willReturn(['items' => []]);
+
+        $this->service->getBoardActions('test-api-key', 'board1', '');
     }
 
     public function testGetBoardActionsPropagatesAuthException(): void
@@ -56,10 +78,21 @@ final class ActionServiceTest extends TestCase
         $this->plankaClient
             ->expects($this->once())
             ->method('get')
-            ->with('test-api-key', '/api/cards/card1/actions')
+            ->with('test-api-key', '/api/cards/card1/actions', [])
             ->willReturn($expected);
 
         $this->assertSame($expected, $this->service->getCardActions('test-api-key', 'card1'));
+    }
+
+    public function testGetCardActionsPagesBack(): void
+    {
+        $this->plankaClient
+            ->expects($this->once())
+            ->method('get')
+            ->with('test-api-key', '/api/cards/card1/actions', ['beforeId' => 'action50'])
+            ->willReturn(['items' => []]);
+
+        $this->service->getCardActions('test-api-key', 'card1', 'action50');
     }
 
     public function testGetCardActionsPropagatesAuthException(): void

@@ -185,7 +185,7 @@ MCP resources are read-only, URI-addressed views of Planka data. MCP clients can
 
 | Tool | Description |
 |---|---|
-| `planka_get_actions` | Get the activity log (actions) for a board or card |
+| `planka_get_actions` | Get the activity log (actions) for a board or card, newest first, 50 at a time (`beforeId` pages back) |
 
 ### Notification Services
 
